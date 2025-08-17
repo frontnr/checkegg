@@ -1,0 +1,75 @@
+getgenv().Configuration = getgenv().Configuration or {
+    WEBHOOK = "https://discord.com/api/webhooks/1406587046868553798/IJg0yE_3UTPefIuBIsneA7BRdLM1wepy0GSyuPUeo8yht8tZrRZG0kz5gZZl1w8Sb1Eo",
+    USE_DISPLAY_NAME = true,
+    STATUS_ORDER = {"Golden", "Diamond", "Electric", "Fire", "Jurassic", "Normal"}
+}
+
+local DISPLAY_NAME_MAP = {
+    Dino = "Jurassic"
+}
+
+local cfg = getgenv().Configuration
+local url = tostring(cfg.WEBHOOK or "")
+if url == "" then return end
+
+local req = (syn and syn.request) or (http and http.request) or http_request or request or (fluxus and fluxus.request) or (krnl and krnl.request)
+if not req then return end
+
+local Http = game:GetService("HttpService")
+local plr = game:GetService("Players").LocalPlayer
+local folder = plr:FindFirstChild("PlayerGui") and plr.PlayerGui:FindFirstChild("Data") and plr.PlayerGui.Data:FindFirstChild("Egg")
+if not folder then return end
+
+local counts, totals, totalEggs = {}, {}, 0
+for _, it in ipairs(folder:GetChildren()) do
+    local t = it:GetAttribute("T")
+    if t then
+        local m = it:GetAttribute("M")
+        m = (m and tostring(m) ~= "" and m) or "Normal"
+        local displayM = DISPLAY_NAME_MAP[m] or m
+        counts[t] = counts[t] or {}
+        counts[t][displayM] = (counts[t][displayM] or 0) + 1
+        totals[t] = (totals[t] or 0) + 1
+        totalEggs += 1
+    end
+end
+
+local order = cfg.STATUS_ORDER
+local who = cfg.USE_DISPLAY_NAME and (plr.DisplayName or plr.Name) or plr.Name
+local out = "`🥚 ไข่ในกระเป๋าของ " .. who .. "  `\n"
+out ..= "          `จำนวนทั้งหมด " .. totalEggs .. " ฟอง  `\n"
+out ..= "───────────────────────────────\n"
+
+local eggNames = {}
+for egg in pairs(counts) do table.insert(eggNames, egg) end
+table.sort(eggNames)
+
+for _, egg in ipairs(eggNames) do
+    local byStatus = counts[egg]
+    local total = totals[egg] or 0
+    out ..= egg .. " ทั้งหมด " .. total .. " ใบ  \n"
+
+    local parts = {}
+    for _, s in ipairs(order) do
+        local c = byStatus[s]
+        if c and c > 0 then
+            table.insert(parts, s .. " " .. c .. " ใบ")
+        end
+    end
+    for s, c in pairs(byStatus) do
+        if not table.find(order, s) then
+            table.insert(parts, s .. " " .. c .. " ใบ")
+        end
+    end
+
+    if #parts > 0 then
+        out ..= "> • " .. table.concat(parts, " / ") .. "  \n"
+    end
+end
+
+req({
+    Url = url,
+    Method = "POST",
+    Headers = {["Content-Type"] = "application/json"},
+    Body = Http:JSONEncode({content = out})
+})
