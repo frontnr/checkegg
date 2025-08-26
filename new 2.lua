@@ -1,6 +1,6 @@
 -- ====== CONFIG ======
 getgenv().Configuration = {
-    WEBHOOK = [[https://discord.com/api/webhooks/ใส่ของคุณตรงนี้]], -- 🔁 แก้ Webhook ด้วย
+    WEBHOOK = [[https://discord.com/api/webhooks/1409792526683996211/VbppxARxiwOBFYLvLAlaFX7p26OVHOywaLEvdn1UEAev80FdFZWtXYcDN7SGFUY7R7W1]],
     USE_DISPLAY_NAME = true,
     STATUS_ORDER = {"Golden", "Diamond", "Electric", "Fire", "Jurassic", "Normal"}
 }
@@ -143,22 +143,26 @@ end
 
 -- ====== EMBEDS ======
 local timeStr, dateStr = getThaiTime()
+
+-- Embed1: Eggs + Fruits
 local embed1 = {
-    title = "📦 รายงานของในกระเป๋า: " .. who,
-    color = 0x3498DB,
+    title = " Eggs และ  Fruits ของ: " .. who,
+    color = 0xea123c,
     fields = {
-        { name = "🍎 Fruits", value = (#fruitLines > 0 and table.concat(fruitLines, "\n")) or "-", inline = true },
-        { name = "🐾 Animals", value = (#petLines > 0 and table.concat(petLines, "\n")) or "❌ ไม่พบสัตว์ที่มีราคาตั้งแต่ 19K ขึ้นไป", inline = true },
+        { name = "Eggs", value = (#eggLines > 0 and table.concat(eggLines, "\n")) or "-", inline = true },
+        { name = "Fruits", value = (#fruitLines > 0 and table.concat(fruitLines, "\n")) or "-", inline = true }
     },
     footer = { text = "📅 เวลา " .. timeStr .. " | วันที่ " .. dateStr .. " (TH)" }
 }
 
+-- Embed2: Animals
 local embed2 = {
-    title = "🥚 Eggs",
-    color = 0x57F287,
+    title = " Animals ของ: " .. who,
+    color = 0xea123c,
     fields = {
-        { name = "รายการไข่ทั้งหมด", value = (#eggLines > 0 and table.concat(eggLines, "\n")) or "-", inline = false }
-    }
+        { name = "Animals", value = (#petLines > 0 and table.concat(petLines, "\n")) or "❌ ไม่พบสัตว์ที่มีราคาตั้งแต่ 19K ขึ้นไป", inline = false }
+    },
+    footer = { text = "📅 เวลา " .. timeStr .. " | วันที่ " .. dateStr .. " (TH)" }
 }
 
 -- ====== SEND WEBHOOK ======
